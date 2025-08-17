@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% block title %}Employees - Company Management{% endblock %}
+
+{% block content %}
+<div class="employee-page">
+  <div class="employee-header">
+    <h2>Employees</h2>
+    <a href="{% url 'employee_create' %}" class="btn-new-employee"><span>+ New Employee</span></a>
+  </div>
+
+  <div class="employee-table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Department</th>
+          <th>Achievements</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for emp in employees %}
+          <tr>
+            <td>{{ emp.name }}</td>
+            <td>{{ emp.email }}</td>
+            <td>{{ emp.phone }}</td>
+            <td>{{ emp.department.name }}</td>
+            <td>
+              {% if emp.achievement_links.all %}
+                <ul>
+                  {% for link in emp.achievement_links.all %}
+                    <li>{{ link.achievement.name }} — {{ link.achievement_date|date:"Y-m-d" }}</li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <em>None</em>
+              {% endif %}
+            </td>
+            <td>
+              <a class="btn btn-edit" href="{% url 'employee_update' emp.pk %}">Edit</a>
+              <a class="btn btn-delete" href="{% url 'employee_delete' emp.pk %}">Delete</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="no-data"><em>No employees found.</em></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Employee page container */
+  .employee-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  /* Header with title and button */
+  .employee-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .employee-header h2 {
+    color: #1e3a8a;
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+
+  /* New employee button */
+  .btn-new-employee {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    background: linear-gradient(90deg, #0d6efd, #60a5fa);
+    color: white;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .btn-new-employee::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .btn-new-employee:hover::before {
+    left: 100%;
+  }
+
+  .btn-new-employee:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    background: linear-gradient(90deg, #0b5ed7, #3b82f6);
+  }
+
+  .btn-new-employee:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  /* Table container */
+  .employee-table-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+  }
+
+  /* Table styling */
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  th, td {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  th {
+    background: #f1f5f9;
+    font-weight: 600;
+    color: #1e3a8a;
+    text-align: left;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  td ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  td ul li {
+    font-size: 0.85rem;
+    color: #4b5563;
+    line-height: 1.4;
+  }
+
+  td em {
+    color: #6b7280;
+    font-style: italic;
+  }
+
+  .no-data {
+    text-align: center;
+    padding: 2rem;
+    color: #6b7280;
+  }
+
+  /* Action buttons */
+  .btn-edit, .btn-delete {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-right: 0.5rem;
+  }
+
+  .btn-edit {
+    background: linear-gradient(90deg, #0d6efd, #60a5fa);
+    color: #fff;
+  }
+
+  .btn-edit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .btn-edit:hover::before {
+    left: 100%;
+  }
+
+  .btn-edit:hover {
+    background: linear-gradient(90deg, #0b5ed7, #3b82f6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+  }
+
+  .btn-delete {
+    background: linear-gradient(90deg, #dc3545, #f87171);
+    color: #fff;
+  }
+
+  .btn-delete::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .btn-delete:hover::before {
+    left: 100%;
+  }
+
+  .btn-delete:hover {
+    background: linear-gradient(90deg, #bb2d3b, #ef4444);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .employee-page {
+      padding: 1rem;
+    }
+
+    .employee-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .btn-new-employee {
+      width: 100%;
+      text-align: center;
+    }
+
+    th, td {
+      font-size: 0.85rem;
+      padding: 0.5rem;
+    }
+
+    .btn-edit, .btn-delete {
+      display: inline-block;
+      width: 100%;
+      margin-bottom: 0.5rem;
+      margin-right: 0;
+    }
+  }
+
+  /* Accessibility */
+  .btn-new-employee:focus-visible, .btn-edit:focus-visible, .btn-delete:focus-visible {
+    outline: 2px solid #0d6efd;
+    outline-offset: 2px;
+  }
+</style>
+{% endblock %}
